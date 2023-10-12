@@ -1,12 +1,12 @@
 sources_count = 3
-source_delay = 100
+source_delay = 1000
 
 devices_count = 3
-device_delay = 5000
+device_delay = 500
 
 buffer_size = 3
 
-modeling_time = 1000000
+modeling_time = 100000
 
 import random
 import math
@@ -20,30 +20,8 @@ calendar = []
 for source_number in range(sources_count):
     heapq.heappush(calendar, (get_next_delay(source_delay), source_number))
 
-devices = [(False, 0)] * devices_count
-device_pointer = 0
-def push_source_time_in_device(t):
-    global device_pointer
-    start = device_pointer
-    while True:
-        if devices[device_pointer][0]:
-            device_pointer = (1 + device_pointer) % devices_count
-            if device_pointer == start:
-                print("no free device", start, device_pointer, t, devices)
-                break
-        else:
-            devices[device_pointer] = (True, t)
-            return device_pointer
-def free_device(i):
-    print("freeee device", i)
-    devices[i] = (False, devices[i][1])
-def have_empty_device():
-    print("have empty dev", devices)
-    for i in range(devices_count):
-        if devices[i][0] == False:
-            print("have", i)
-            return True
-    return False
+import devices
+devs = devices.DevicesCollection(devices_count)
 
 buffer = [(False, 0)] * buffer_size
 def buffer_has_place():
@@ -84,9 +62,9 @@ while True:
         source_number = event[1]
         print("source n", source_number)
         heapq.heappush(calendar, (t + get_next_delay(source_delay), source_number))
-        if have_empty_device():
+        if devs.have_empty_device():
             print("have")
-            heapq.heappush(calendar, (t + get_next_delay(device_delay), sources_count + push_source_time_in_device(t)))
+            heapq.heappush(calendar, (t + get_next_delay(device_delay), sources_count + devs.push(t)))
         elif buffer_has_place():
             push_source_time_in_buffer(t)
         else:
@@ -94,9 +72,9 @@ while True:
     else:
         device_number = event[1] - sources_count
         print("device n", device_number)
-        free_device(device_number)
+        devs.free_device(device_number)
         if buffer_is_empty() == False:
             source_time = pop_source_time_from_buffer()
-            heapq.heappush(calendar, (t + get_next_delay(device_delay), sources_count + push_source_time_in_device(source_time)))
+            heapq.heappush(calendar, (t + get_next_delay(device_delay), sources_count + devs.push(source_time)))
 
 
