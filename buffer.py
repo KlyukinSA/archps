@@ -2,7 +2,7 @@ class BufferCollection:
 
     def __init__(self, buffer_size):
         self.buffer_size = buffer_size
-        self.buffer = [(False, 0)] * buffer_size
+        self.buffer = [(False, None)] * buffer_size
 
     def has_place(self):
         for i in range(self.buffer_size):

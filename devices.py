@@ -3,7 +3,7 @@ class DevicesCollection:
     def __init__(self, devices_count):
         self.devices_count = devices_count
         self.device_pointer = 0
-        self.devices = [(False, 0)] * devices_count
+        self.devices = [(False, None)] * devices_count
 
     def push(self, source_time):
         start = self.device_pointer
